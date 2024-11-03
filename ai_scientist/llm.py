@@ -36,14 +36,20 @@ AVAILABLE_LLMS = [
     "custom-model",
 ]
 
- 
-def _get_response(user_message: str) -> str: 
-    context = [{"type": "Human", "text": user_message}] 
-    request_data = {"config": "scale", "context": context} 
-    headers = {"Authorization": f"Token {CUSTOM_MODEL_TOKEN}", "Content-Type": "application/json"} 
-    resp = requests.post(url=ENDPOINT, headers=headers, json=request_data) 
-    return resp.json()["text"]
+class CustomModelClient:
+    def __init__(self, endpoint, token):
+        self.endpoint = endpoint
+        self.token = token
 
+    def get_response(self, message):
+        context = [{"type": "Human", "text": message}]
+        request_data = {"config": "scale", "context": context}
+        headers = {
+            "Authorization": f"Token {self.token}",
+            "Content-Type": "application/json"
+        }
+        response = requests.post(url=self.endpoint, headers=headers, json=request_data)
+        return response.json().get("text", "")
 
 # Get N responses from a single message, used for ensembling.
 @backoff.on_exception(backoff.expo, (openai.RateLimitError, openai.APITimeoutError))
@@ -121,7 +127,7 @@ def get_batch_responses_from_llm(
         new_msg_history = []
         
         for _ in range(n_responses):
-            response_text = _get_response(msg)
+            response_text = client.get_response(msg)
             content.append(response_text)
             updated_history = msg_history + [{"role": "user", "content": msg}] + [{"role": "assistant", "content": response_text}]
             new_msg_history.append(updated_history)
@@ -264,9 +270,8 @@ def get_response_from_llm(
         content = response.choices[0].message.content
         new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
     elif model == "custom-model":
-        new_msg_history = msg_history + [{"role": "user", "content": msg}]
-        user_message = msg 
-        content = _get_response(user_message)
+        new_msg_history = msg_history + [{"role": "user", "content": msg}] 
+        content = client.get_response(msg)
         new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
     else:
         raise ValueError(f"Model {model} not supported.")
@@ -343,6 +348,7 @@ def create_client(model):
         ), "meta-llama/llama-3.1-405b-instruct"
     elif model == "custom-model":
         print(f"Using Custom model with endpoint.")
+        return CustomModelClient(ENDPOINT, CUSTOM_MODEL_TOKEN), model
     else:
         raise ValueError(f"Model {model} not supported.")
 
