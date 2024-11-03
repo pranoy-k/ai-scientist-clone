@@ -33,6 +33,7 @@ AVAILABLE_LLMS = [
     "vertex_ai/claude-3-5-sonnet@20240620",
     "vertex_ai/claude-3-sonnet@20240229",
     "vertex_ai/claude-3-haiku@20240307",
+    "custom-model",
 ]
 
  
