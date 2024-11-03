@@ -11,7 +11,7 @@
   📂 <a href="https://drive.google.com/drive/folders/1G7A0wTqfXVa-cpexjk0oaXakaSJwffEt">[Drive Folder]</a>
 </p>
 
-One of the grand challenges of artificial intelligence is developing agents capable of conducting scientific research and discovering new knowledge. While frontier models have already been used to aid human scientists—for example, for brainstorming ideas or writing code—they still require extensive manual supervision or are heavily constrained to specific tasks.
+One of the grand challenges of artificial intelligence is developing agents capable of conducting scientific research and discovering new knowledge. While frontier models have already been used to aid human scientists—for example, for brainstorming ideas or writing code—they still require extensive manual supervision or are heavily constrained to specific tasks. AI Scientist
 
 We're excited to introduce **The AI Scientist**, the first comprehensive system for fully automatic scientific discovery, enabling Foundation Models such as Large Language Models (LLMs) to perform research independently.
 
