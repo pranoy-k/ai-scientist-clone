@@ -340,6 +340,8 @@ def create_client(model):
             api_key=os.environ["OPENROUTER_API_KEY"],
             base_url="https://openrouter.ai/api/v1"
         ), "meta-llama/llama-3.1-405b-instruct"
+    elif model == "custom-model":
+        print(f"Using Custom model with endpoint.")
     else:
         raise ValueError(f"Model {model} not supported.")
 
