@@ -6,6 +6,11 @@ import anthropic
 import backoff
 import openai
 
+import requests
+ 
+ENDPOINT = os.getenv("ENDPOINT")
+CUSTOM_MODEL_TOKEN = os.getenv("CUSTOM_MODEL_TOKEN")
+
 MAX_NUM_TOKENS = 4096
 
 AVAILABLE_LLMS = [
@@ -29,6 +34,14 @@ AVAILABLE_LLMS = [
     "vertex_ai/claude-3-sonnet@20240229",
     "vertex_ai/claude-3-haiku@20240307",
 ]
+
+ 
+def _get_response(user_message: str) -> str: 
+    context = [{"type": "Human", "text": user_message}] 
+    request_data = {"config": "scale", "context": context} 
+    headers = {"Authorization": f"Token {CUSTOM_MODEL_TOKEN}", "Content-Type": "application/json"} 
+    resp = requests.post(url=ENDPOINT, headers=headers, json=request_data) 
+    return resp.json()["text"]
 
 
 # Get N responses from a single message, used for ensembling.
@@ -102,6 +115,15 @@ def get_batch_responses_from_llm(
         new_msg_history = [
             new_msg_history + [{"role": "assistant", "content": c}] for c in content
         ]
+    elif model == "custom-model":
+        content = []
+        new_msg_history = []
+        
+        for _ in range(n_responses):
+            response_text = _get_response(msg)
+            content.append(response_text)
+            updated_history = msg_history + [{"role": "user", "content": msg}] + [{"role": "assistant", "content": response_text}]
+            new_msg_history.append(updated_history)
     else:
         content, new_msg_history = [], []
         for _ in range(n_responses):
@@ -240,6 +262,11 @@ def get_response_from_llm(
         )
         content = response.choices[0].message.content
         new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
+    elif model == "custom-model":
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        user_message = msg 
+        content = _get_response(user_message)
+        new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
     else:
         raise ValueError(f"Model {model} not supported.")
 
@@ -315,3 +342,5 @@ def create_client(model):
         ), "meta-llama/llama-3.1-405b-instruct"
     else:
         raise ValueError(f"Model {model} not supported.")
+
+
