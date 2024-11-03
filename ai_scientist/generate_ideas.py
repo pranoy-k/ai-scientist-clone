@@ -67,6 +67,18 @@ NEW IDEA JSON:
 ```json
 <JSON>
 ```
+In <THOUGHT>, first carefully consider the quality, novelty, and feasibility of the idea you just created. Include any other factors that you think are important in evaluating the idea and try and refine and improve your idea. Justify how the idea is different from the existing ones.
+
+In <JSON>, provide the refined idea in JSON format with the following fields:
+- "Name": A shortened descriptor of the idea. Lowercase, no spaces, underscores allowed.
+- "Title": A title for the idea, will be used for the report writing.
+- "Experiment": An outline of the implementation. E.g. which functions need to be added or modified, how results will be obtained, ...
+- "Interestingness": A rating from 1 to 10 (lowest to highest).
+- "Feasibility": A rating from 1 to 10 (lowest to highest).
+- "Novelty": A rating from 1 to 10 (lowest to highest).
+
+Be cautious and realistic on your ratings.
+This JSON will be automatically parsed, so ensure the format is precise.
 
 If there is nothing to improve, simply repeat the previous JSON EXACTLY after the thought and include "I am done" at the end of the thoughts but before the JSON.
 ONLY INCLUDE "I am done" IF YOU ARE MAKING NO MORE CHANGES."""
